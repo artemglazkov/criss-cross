@@ -40,7 +40,7 @@ class Game {
   }
 
   put(x, y, mark) {
-    const isValid = (x) => x > 0 && x <= 3;
+    const isValid = (x) => x >= 0 && x <= 3;
     if (!isValid(x) || !isValid(y))
       return console.log(`Out of range ${x}, ${y}`);
     if (this.values[x][y])
