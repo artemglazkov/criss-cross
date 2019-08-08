@@ -13,7 +13,7 @@
 
 class Game {
   constructor() {
-    this.over = false;
+    this.turns = 0;
     this.values = [
       [null, null, null],
       [null, null, null],
@@ -21,15 +21,19 @@ class Game {
     ]
   }
 
+  get isOver() {
+    return this.turns > 8;
+  }
+
   async play(...players) {
     console.log('Lets play the Cris-Cross game');
     this.draw();
-    while (!this.over) {
-      for (let player of players) {
-        console.log(`${player.name}\'s turn with '${player.mark}':`);
-        await player.play(this);
-      }
+    while (!this.isOver) {
+      let player = players[this.turns % 2];
+      console.log(`${player.name}\'s turn with '${player.mark}':`);
+      await player.play(this);
     }
+    console.log('GAME OVER');
   }
 
   draw() {
@@ -47,6 +51,7 @@ class Game {
       return console.log(`You cannot put ${mark} at ${x}, ${y}`);
 
     this.values[x][y] = mark;
+    this.turns++;
     this.draw();
   }
 }
@@ -82,20 +87,31 @@ class RealPlayer extends Player {
   }
 }
 
-class BotPlayer extends Player {
-  constructor(mark) {
-    super('Bot player', mark);
-  }
-
-  async play(game) {
+class SimpleBotStrategy {
+  findNext(game) {
     const values = game.values;
     for (let i = 0; i < values.length; i++)
       for (let j = 0; j < values[i].length; j++)
         if (!values[i][j])
-          return game.put(i, j, this.mark);
+          return [i, j];
+  }
+}
+
+class BotPlayer extends Player {
+  constructor(mark, strategy) {
+    super('Bot player', mark);
+    this.strategy = strategy;
+  }
+
+  async play(game) {
+    const [x, y] = this.strategy.findNext(game);
+    game.put(x, y, this.mark);
   }
 }
 
 (async () => {
-  await new Game().play(new RealPlayer('x'), new BotPlayer('o'));
+  await new Game().play(
+    new RealPlayer('x'),
+    new BotPlayer('o', new SimpleBotStrategy())
+  );
 })();
