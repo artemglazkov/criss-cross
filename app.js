@@ -87,16 +87,6 @@ class RealPlayer extends Player {
   }
 }
 
-class SimpleBotStrategy {
-  findNext(game) {
-    const values = game.values;
-    for (let i = 0; i < values.length; i++)
-      for (let j = 0; j < values[i].length; j++)
-        if (!values[i][j])
-          return [i, j];
-  }
-}
-
 class BotPlayer extends Player {
   constructor(mark, strategy) {
     super('Bot player', mark);
@@ -106,6 +96,16 @@ class BotPlayer extends Player {
   async play(game) {
     const [x, y] = this.strategy.findNext(game);
     game.put(x, y, this.mark);
+  }
+}
+
+class SimpleBotStrategy {
+  findNext(game) {
+    const values = game.values;
+    for (let i = 0; i < values.length; i++)
+      for (let j = 0; j < values[i].length; j++)
+        if (!values[i][j])
+          return [i, j];
   }
 }
 
