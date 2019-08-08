@@ -1,16 +1,5 @@
 'use strict';
 
-/**
- * Play the Criss Cross game
- * x |  |
- *   |  | o
- *   |  |
- * The field 3x3, input coords using space, for example:
- * "1 2"
- * First player is a real one and plays with 'x'
- * Then computer plays with 'o', etc.
- */
-
 class Game {
   constructor() {
     this.turns = 0;
@@ -34,6 +23,7 @@ class Game {
       await player.play(this);
     }
     console.log('GAME OVER');
+    process.exit();
   }
 
   draw() {
@@ -48,7 +38,7 @@ class Game {
     if (!isValid(x) || !isValid(y))
       return console.log(`Out of range ${x}, ${y}`);
     if (this.values[x][y])
-      return console.log(`You cannot put ${mark} at ${x}, ${y}`);
+      return console.log(`You cannot put '${mark}' at ${x}, ${y}`);
 
     this.values[x][y] = mark;
     this.turns++;
