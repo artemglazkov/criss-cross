@@ -1,14 +1,14 @@
 'use strict';
 
 /**
- * Play the Cris-Cross game
+ * Play the Criss Cross game
  * x |  |
  *   |  | o
  *   |  |
  * The field 3x3, input coords using space, for example:
- * "your move > 1 2"
- * First player is a real and plays with 'x'
- * Then computer's turn with 'o'
+ * "1 2"
+ * First player is a real one and plays with 'x'
+ * Then computer plays with 'o', etc.
  */
 
 class Game {
@@ -26,7 +26,7 @@ class Game {
   }
 
   async play(...players) {
-    console.log('Lets play the Cris-Cross game');
+    console.log('Lets play Criss Cross game');
     this.draw();
     while (!this.isOver) {
       let player = players[this.turns % 2];
