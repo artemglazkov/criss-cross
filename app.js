@@ -1,17 +1,15 @@
 'use strict';
 
 /**
- X| |
- | |O
- | |
-
- * поле 3 на 3, ввод координат через пробелы
- * первый ход делает человек крестиком
- * ввод координат выглядит как-то так: "your move > 1 2"
- * затем автоматом ходит компьютер ноликом
- * есть всего полчаса, нормально, если сделаешь не все, нужно успеть сделать по-максимуму
- * можно гуглить
- /**/
+ * Play the Cris-Cross game
+ * x |  |
+ *   |  | o
+ *   |  |
+ * The field 3x3, input coords using space, for example:
+ * "your move > 1 2"
+ * First player is a real and plays with 'x'
+ * Then computer's turn with 'o'
+ */
 
 class Game {
   constructor() {
