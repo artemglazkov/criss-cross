@@ -15,3 +15,9 @@ Input coordinates using space, for example:
 
 First player is a real one and plays with 'x'.
 Then computer plays with 'o', etc.
+
+# How to play
+To play the game run
+```
+npm start
+```
