@@ -3,6 +3,7 @@
 class Game {
   constructor() {
     this.turns = 0;
+    this.hasWinner = false;
     this.values = [
       [null, null, null],
       [null, null, null],
@@ -11,17 +12,20 @@ class Game {
   }
 
   get isOver() {
-    return this.turns > 8;
+    return this.hasWinner || this.turns > 8;
   }
 
   async play(...players) {
     console.log('Lets play Criss Cross game');
     this.draw();
+    let player;
     while (!this.isOver) {
-      let player = players[this.turns % 2];
+      player = players[this.turns % 2];
       console.log(`${player.name}\'s turn with '${player.mark}':`);
       await player.play(this);
     }
+    if (this.hasWinner)
+      console.log(`!!! ${player.name} wins !!!`);
     console.log('GAME OVER');
     process.exit();
   }
@@ -33,6 +37,19 @@ class Game {
     console.log(theGame);
   }
 
+  checkWinAt(x, y, mark) {
+    const winRow = this.values[x].reduce((r, v) => (r && v === mark), true);
+    const winCol = this.values.reduce((r, row) => (r && row[y] === mark), true);
+
+    let [winDiag1, winDiag2] = [true, true];
+    for (let i = 0; i < this.values.length; i++) {
+      winDiag1 &= this.values[i][i] === mark;
+      winDiag2 &= this.values[this.values.length - 1 - i][this.values.length - 1 - i] === mark;
+    }
+
+    return winRow || winCol || winDiag1 || winDiag2;
+  }
+
   put(x, y, mark) {
     const isValid = (x) => x >= 0 && x <= 3;
     if (!isValid(x) || !isValid(y))
@@ -42,6 +59,7 @@ class Game {
 
     this.values[x][y] = mark;
     this.turns++;
+    this.hasWinner = this.checkWinAt(x, y, mark);
     this.draw();
   }
 }
