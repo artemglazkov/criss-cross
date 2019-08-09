@@ -1,18 +1,20 @@
 'use strict';
 
 class Game {
-  constructor() {
+  constructor(size) {
     this.turns = 0;
     this.hasWinner = false;
-    this.values = [
-      [null, null, null],
-      [null, null, null],
-      [null, null, null],
-    ]
+    this.size = size;
+    this.values = [];
+    for (let i = 0; i < size; i++) {
+      this.values.push([]);
+      for (let j = 0; j < size; j++)
+        this.values[i][j] = null;
+    }
   }
 
   get isOver() {
-    return this.hasWinner || this.turns > 8;
+    return this.hasWinner || this.turns > Math.pow(this.size, 2) - 1;
   }
 
   async play(...players) {
@@ -42,16 +44,16 @@ class Game {
     const winCol = this.values.reduce((r, row) => (r && row[y] === mark), true);
 
     let [winDiag1, winDiag2] = [true, true];
-    for (let i = 0; i < this.values.length; i++) {
+    for (let i = 0; i < this.size; i++) {
       winDiag1 &= this.values[i][i] === mark;
-      winDiag2 &= this.values[this.values.length - 1 - i][this.values.length - 1 - i] === mark;
+      winDiag2 &= this.values[this.size - 1 - i][this.size - 1 - i] === mark;
     }
 
     return winRow || winCol || winDiag1 || winDiag2;
   }
 
   put(x, y, mark) {
-    const isValid = (x) => x >= 0 && x <= 3;
+    const isValid = (x) => x >= 0 && x < this.size;
     if (!isValid(x) || !isValid(y))
       return console.log(`Out of range ${x}, ${y}`);
     if (this.values[x][y])
