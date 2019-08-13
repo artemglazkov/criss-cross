@@ -1,6 +1,7 @@
 'use strict';
 
 const socket = require('socket.io-client')('http://localhost:3000');
+const {ConsoleGameRenderer} = require('./console');
 
 socket.on('connect', function () {
   console.log('connect');
@@ -8,7 +9,7 @@ socket.on('connect', function () {
 
 socket.on('status', function (status) {
   console.log('The game');
-  console.log(status);
+  console.log(new ConsoleGameRenderer().render(status));
 });
 
 socket.on('disconnect', function () {

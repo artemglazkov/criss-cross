@@ -5,6 +5,7 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
 const {Game, RealPlayer, BotPlayer, SimpleBotStrategy} = require('./criss-cross');
+const {ConsoleGameRenderer} = require('./console');
 
 let game;
 
@@ -37,8 +38,8 @@ class SocketInputController {
   put({x, y, mark}) {
     console.log(this.socket.id, `player ${this.socket.id} put '${mark}' to [${x},${y}]`);
     game.put(x, y, mark);
-    game.draw();
-    this.socket.emit('status', game.values);
+    console.log(new ConsoleGameRenderer().render(game));
+    this.socket.emit('status', game);
   }
 }
 

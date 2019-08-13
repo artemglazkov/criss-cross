@@ -19,13 +19,13 @@ class Game {
 
   async play(...players) {
     console.log('Lets play Criss Cross game');
-    this.draw();
+    this._draw();
     let player;
     while (!this.isOver) {
       player = players[this.turns % 2];
       console.log(`${player.name}\'s turn with '${player.mark}':`);
       await player.play(this);
-      this.draw();
+      this._draw();
     }
     if (this.hasWinner)
       console.log(`!!! ${player.name} wins !!!`);
@@ -33,11 +33,8 @@ class Game {
     process.exit();
   }
 
-  draw() {
-    const theGame = this.values
-      .map(row => row.map(value => !value ? ' ' : value).join(' | '))
-      .join('\n');
-    console.log(theGame);
+  _draw() {
+    console.log(new ConsoleGameRenderer().render(this));
   }
 
   checkWinAt(x, y, mark) {
