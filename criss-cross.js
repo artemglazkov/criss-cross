@@ -25,6 +25,7 @@ class Game {
       player = players[this.turns % 2];
       console.log(`${player.name}\'s turn with '${player.mark}':`);
       await player.play(this);
+      this.draw();
     }
     if (this.hasWinner)
       console.log(`!!! ${player.name} wins !!!`);
@@ -62,7 +63,6 @@ class Game {
     this.values[x][y] = mark;
     this.turns++;
     this.hasWinner = this.checkWinAt(x, y, mark);
-    this.draw();
   }
 }
 
