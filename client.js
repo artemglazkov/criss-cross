@@ -12,14 +12,16 @@ socket.on('status', function (status) {
   console.log(new ConsoleGameRenderer().render(status));
 });
 
+socket.on('statusError', function (err) {
+  console.error(err.message);
+});
+
 socket.on('disconnect', function () {
   console.log('disconnect');
 });
 
 process.stdin.on('data', bytes => {
   const [x, y] = bytes.toString().trim().split(' ');
-  if (x && y) {
-    console.log('Emit put', {x: x, y: y, mark: 'x'});
+  if (x && y)
     socket.emit('put', {x: x, y: y, mark: 'x'});
-  }
 });
