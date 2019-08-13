@@ -6,19 +6,44 @@ const io = require('socket.io')(http);
 
 const {Game, RealPlayer, BotPlayer, SimpleBotStrategy} = require('./criss-cross');
 
-io.on('connection', function (socket) {
-  console.log('a user connected');
-  const game = new Game(3);
+let game;
 
-  socket.on('disconnect', function () {
-    console.log('user disconnected');
-  });
+class EventBinder {
+  bind(source, target) {
+    Object.getOwnPropertyNames(source.__proto__)
+      .filter(m => m !== 'constructor' && !m.startsWith('_'))
+      .forEach(method => {
+        target.on(method, (...args) => source[method].apply(source, args));
+      });
+  }
+}
 
-  socket.on('put', function ({x, y, mark}) {
-    console.log(`user ${socket.id} puts '${mark}' to [${x},${y}]`);
+class SocketInputController {
+  constructor(socket) {
+    this.socket = socket;
+    new EventBinder().bind(this, socket);
+  }
+
+  connect() {
+    console.log(this.socket.id, `player ${this.socket.id} connected`);
+    if (!game)
+      game = new Game(3);
+  }
+
+  disconnect() {
+    console.log(this.socket.id, `player ${this.socket.id} disconnected`);
+  }
+
+  put({x, y, mark}) {
+    console.log(this.socket.id, `player ${this.socket.id} put '${mark}' to [${x},${y}]`);
     game.put(x, y, mark);
-    socket.emit('status', game.values);
-  });
+    game.draw();
+    this.socket.emit('status', game.values);
+  }
+}
+
+io.on('connection', function (socket) {
+  new SocketInputController(socket).connect();
 });
 
 http.listen(3000, function () {
