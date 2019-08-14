@@ -4,7 +4,11 @@ const socket = require('socket.io-client')('http://localhost:3000');
 const {ConsoleGameRenderer} = require('./lib/tools');
 
 socket.on('connect', function () {
-  console.log('connect');
+  socket.emit('join', (mark, status) => {
+    console.log(`Connect to the game`);
+    console.log(new ConsoleGameRenderer().render(status));
+    console.log(`Play with ${mark}`);
+  });
 });
 
 socket.on('status', function (status) {
@@ -20,6 +24,7 @@ socket.on('disconnect', function () {
   console.log('disconnect');
 });
 
+console.log('Waiting for the game...');
 process.stdin.on('data', bytes => {
   const [x, y] = bytes.toString().trim().split(' ');
   if (x && y)
