@@ -20,6 +20,10 @@ socket.on('statusError', function (err) {
   console.error(err.message);
 });
 
+socket.on('message', function (message) {
+  console.log(message);
+});
+
 socket.on('disconnect', function () {
   console.log('disconnect');
 });

@@ -8,7 +8,7 @@ describe('Game', () => {
   let man, bot;
 
   beforeEach(() => {
-    game = new Game();
+    game = new Game(2);
     man = new User('Nick');
     bot = new User('Bot');
   });
@@ -70,7 +70,7 @@ describe('Game', () => {
 
     it('passes the move to another man', () => {
       game.put(1, 1, game.players[0]);
-      expect(game.currentPlayer.user).eq(bot);
+      expect(game.currentPlayer).eq(game.players[1]);
     });
 
     it('runs around the circle', () => {
@@ -79,8 +79,8 @@ describe('Game', () => {
       expect(game.currentPlayer).eql(game.players[0]);
     });
 
-    it('does not allow pass the wrong man', () => {
-      expect(() => game.put(0, 1, bot)).throws('Wrong player order');
+    it('does not allow pass the wrong player', () => {
+      expect(() => game.put(0, 1, game.players[1])).throws('Wrong player order');
     });
 
     it('does not allow put value over the field', () => {
@@ -98,5 +98,42 @@ describe('Game', () => {
       game.put(1, 1, game.players[0]);
       expect(() => game.put(1, 1, game.players[1])).throws('Cell [1,1] is already busy');
     });
+
+    describe('when nobody wins', () => {
+      beforeEach(() => {
+        game.put(1, 1, game.players[0]);
+      });
+
+      it('sets @winner to current player', () => {
+        expect(game.winner).is.null;
+      });
+
+      it('sets @isOver to True', () => {
+        expect(game.isOver).eq(false);
+      });
+    });
+
+    describe('when player wins', () => {
+      beforeEach(() => {
+        game.values = [
+          ['x', null],
+          [null, null],
+        ];
+        game.put(1, 1, game.players[0]);
+      });
+
+      it('sets @winner to current player', () => {
+        expect(game.winner).eq(game.players[0]);
+      });
+
+      it('sets @isOver to True', () => {
+        expect(game.isOver).eq(true);
+      });
+
+      it('does not allow move anymore', () => {
+        expect(() => game.put(0, 1, game.players[1])).throws('Game is over');
+      });
+    });
   });
+
 });
