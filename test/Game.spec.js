@@ -50,6 +50,13 @@ describe('Game', () => {
         expect(game.players[0].profile).eq(frodo);
         expect(game.players[1].profile).eq(sam);
       });
+
+      it('starts the game when all players registered an the first one is a Bot', () => {
+        game.register(bot);
+        game.register(frodo);
+        expect(game.turns).eq(1);
+        expect(game.currentPlayer).eq(game.players[1]);
+      });
     });
 
     describe('when index is specified', () => {
