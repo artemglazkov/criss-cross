@@ -1,16 +1,17 @@
 'use strict';
 
 const {expect} = require('chai');
-const {User, Player, Game} = require('../lib/domain');
+const {User, Bot, Player, Game, SimpleBotStrategy} = require('../lib/domain');
 
 describe('Game', () => {
   let game;
-  let man, bot;
+  let frodo, sam, bot;
 
   beforeEach(() => {
-    game = new Game(2);
-    man = new User('Nick');
-    bot = new User('Bot');
+    game = new Game();
+    frodo = new User('Nick');
+    sam = new User('Bot');
+    bot = new Bot(SimpleBotStrategy.findNext);
   });
 
   describe('#constructor', () => {
@@ -22,38 +23,59 @@ describe('Game', () => {
   });
 
   describe('#register', () => {
-    it('sets @user to man', () => {
-      game.register(man);
-      expect(game.players[0].user).eq(man);
-      expect(game.players[1].user).is.undefined;
+    describe('when index is not specified', () => {
+      it('sets user to player', () => {
+        game.register(frodo);
+        expect(game.players[0].user).eq(frodo);
+        expect(game.players[1].user).is.undefined;
+      });
+
+      it('returns registered player', () => {
+        let res = game.register(frodo);
+        expect(res).instanceOf(Player);
+        expect(res.user).eq(frodo);
+      });
+
+      it('sets user to first unregistered player', () => {
+        game.register(frodo);
+        game.register(sam);
+        expect(game.players[0].user).eq(frodo);
+        expect(game.players[1].user).eq(sam);
+      });
+
+      it('does not reset registered players', () => {
+        game.register(frodo);
+        game.register(sam);
+        game.register(new User('Another'));
+        expect(game.players[0].user).eq(frodo);
+        expect(game.players[1].user).eq(sam);
+      });
     });
 
-    it('returns registered man', () => {
-      let res = game.register(man);
-      expect(res).instanceOf(Player);
-      expect(res.user).eq(man);
-    });
+    describe('when index is specified', () => {
+      it('sets @user to player at given index', () => {
+        game.register(frodo, 1);
+        expect(game.players[1].user).eq(frodo);
+      });
 
-    it('sets @user to first unregistered man', () => {
-      game.register(man);
-      game.register(bot);
-      expect(game.players[0].user).eq(man);
-      expect(game.players[1].user).eq(bot);
-    });
+      it('returns registered player', () => {
+        let res = game.register(frodo, 1);
+        expect(res).instanceOf(Player);
+        expect(res.user).eq(frodo);
+      });
 
-    it('does not reset registered players', () => {
-      game.register(man);
-      game.register(bot);
-      game.register(new User('Another'));
-      expect(game.players[0].user).eq(man);
-      expect(game.players[1].user).eq(bot);
+      it('resets registered player', () => {
+        game.register(frodo, 1);
+        game.register(sam, 1);
+        expect(game.players[1].user).eq(sam);
+      });
     });
   });
 
   describe('#put', () => {
     beforeEach(() => {
-      game.register(man);
-      game.register(bot);
+      game.register(frodo);
+      game.register(sam);
     });
 
     it('puts mark to given coordinates', () => {
@@ -68,7 +90,7 @@ describe('Game', () => {
           expect(game.values[i][j]).is.null;
     });
 
-    it('passes the move to another man', () => {
+    it('passes the move to another frodo', () => {
       game.put(1, 1, game.players[0]);
       expect(game.currentPlayer).eq(game.players[1]);
     });
@@ -116,8 +138,9 @@ describe('Game', () => {
     describe('when player wins', () => {
       beforeEach(() => {
         game.values = [
-          ['x', null],
-          [null, null],
+          ['x', null, null],
+          [null, null, null],
+          [null, null, 'x'],
         ];
         game.put(1, 1, game.players[0]);
       });
@@ -132,6 +155,29 @@ describe('Game', () => {
 
       it('does not allow move anymore', () => {
         expect(() => game.put(0, 1, game.players[1])).throws('Game is over');
+      });
+    });
+
+    describe('when second player is a Bot', () => {
+      beforeEach(() => {
+        game.register(bot, 1);
+      });
+
+      it('plays as as sam automatically', () => {
+        game.put(1, 1, game.players[0]);
+        expect(game.turns).eq(2);
+        expect(game.values[0][0]).eq(game.players[1].mark);
+        expect(game.currentPlayer).eq(game.players[0]);
+      });
+
+      it('plays with a Bot till the end', () => {
+        game.put(0, 0, game.players[0]);
+        game.put(1, 0, game.players[0]);
+        game.put(1, 1, game.players[0]);
+        game.put(2, 1, game.players[0]);
+        game.put(2, 2, game.players[0]);
+        expect(game.turns).eq(9);
+        expect(game.isOver).eq(true);
       });
     });
   });
