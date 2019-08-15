@@ -6,7 +6,7 @@ chai.use(require('sinon-chai'));
 const {expect} = chai;
 const sinon = require('sinon');
 const {SocketInputController} = require('../lib/server');
-const {Human, Game} = require('../lib/domain');
+const {Human, Bot, Game} = require('../lib/domain');
 
 describe('SocketInputController', () => {
   let frodo, game;
@@ -25,32 +25,32 @@ describe('SocketInputController', () => {
 
   describe('#start', () => {
     it('creates a new Game', () => {
-      controller.start(() => null);
+      controller.start({}, () => null);
       expect(gameRegistry.add).called;
       expect(gameRegistry.add.firstCall.args[0]).instanceOf(Game);
     });
 
     it('joins self to the Game', () => {
-      controller.start(() => null);
+      controller.start({}, () => null);
       expect(gameRegistry.add).called;
       expect(gameRegistry.add.firstCall.args[0].players[0].profile).eq(controller.user);
     });
 
     it('joins to the socket room', () => {
-      controller.start(() => null);
+      controller.start({}, () => null);
       const game = gameRegistry.add.firstCall.args[0];
       expect(socket.join).called;
       expect(socket.join.firstCall.args[0]).eq(game.id);
     });
 
     it('emits [join]', () => {
-      controller.start(() => null);
+      controller.start({}, () => null);
       expect(out.join).called;
     });
 
     it('calls callback', () => {
       const callback = sinon.stub();
-      controller.start(callback);
+      controller.start({}, callback);
       const game = gameRegistry.add.firstCall.args[0];
       const player = game.players[0];
       expect(callback).called;
@@ -64,6 +64,12 @@ describe('SocketInputController', () => {
         isOver: game.isOver,
         winner: undefined
       });
+    });
+
+    it('registers second Bot player ', () => {
+      controller.start({bot: true}, () => null);
+      const game = gameRegistry.add.firstCall.args[0];
+      expect(game.players[1].profile).instanceOf(Bot);
     });
   });
 

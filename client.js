@@ -7,9 +7,16 @@ let playerId;
 
 function joined(player, game) {
   playerId = player.id;
-  console.log(`Joined to the game ${game.id}`);
+  console.log();
+  console.log(`You have joined to the game as ${player.name}`);
+  console.log();
+  console.log(`Enter coordinates separated by space. For example:`);
+  console.log(`For example:`);
+  console.log(`  1 1   - to put '${player.mark}' to the center`);
+  console.log(`  0 2   - to put '${player.mark}' to the right top corner`);
+  console.log();
+  console.log('The game');
   console.log(new ConsoleGameRenderer().render(game));
-  console.log(`Play with ${player.mark}`);
 }
 
 socket.on('connect', () => {
@@ -37,12 +44,15 @@ socket.on('disconnect', () => {
   console.log('disconnect');
 });
 
-console.log('Waiting for the game...');
+console.log('Enter a command');
+console.log('  /start      - play with another player');
+console.log('  /start bot  - play with a bot');
+console.log();
 process.stdin.on('data', bytes => {
   const command = bytes.toString().trim();
   if (command.startsWith('/')) {
     if (command.match(/^\/start/i)) {
-      socket.emit('start', joined);
+      socket.emit('start', {bot: Boolean(command.match(/\s+bot\s*/i))}, joined);
     }
   } else {
     const [x, y] = command.split(' ');
