@@ -233,9 +233,23 @@ describe('Game', () => {
         isOver: true,
         winner: {
           id: game.players[1].id,
-          name: bot.name
+          name: bot.name,
+          mark: 'o'
         }
       });
+    });
+  });
+
+  describe('@isPending', () => {
+    it('returns True when there is at least one unregistered Player', () => {
+      game.register(frodo);
+      expect(game.isPending).eq(true);
+    });
+
+    it('returns False when there are not any unregistered Player', () => {
+      game.register(frodo);
+      game.register(sam);
+      expect(game.isPending).eq(false);
     });
   });
 

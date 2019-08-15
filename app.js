@@ -3,17 +3,12 @@
 const app = require('express')();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const {Bot, Game, SimpleBotStrategy} = require('./lib/domain');
-const {SocketInputController, SocketOutputController} = require('./lib/server');
+const {SocketInputController, SocketOutputController, GameRegistry} = require('./lib/server');
 
-let game;
+const gameRegistry = new GameRegistry();
 
 io.on('connection', function (socket) {
-  if (!game) {
-    game = new Game(3);
-    game.register(new Bot(SimpleBotStrategy.findNext), 1);
-  }
-  new SocketInputController(socket, new SocketOutputController(socket), game).connect();
+  new SocketInputController(socket, new SocketOutputController(socket), gameRegistry).connect();
 });
 
 http.listen(3000, function () {
