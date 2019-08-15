@@ -13,6 +13,7 @@ function joined(player, game) {
 }
 
 socket.on('connect', () => {
+  socket.emit('join', joined);
 });
 
 socket.on('join', () => {
