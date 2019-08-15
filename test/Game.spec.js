@@ -1,7 +1,7 @@
 'use strict';
 
 const {expect} = require('chai');
-const {User, Bot, Player, Game, SimpleBotStrategy} = require('../lib/domain');
+const {Human, Bot, Player, Game, SimpleBotStrategy} = require('../lib/domain');
 
 describe('Game', () => {
   let game;
@@ -9,8 +9,8 @@ describe('Game', () => {
 
   beforeEach(() => {
     game = new Game();
-    frodo = new User('Nick');
-    sam = new User('Bot');
+    frodo = new Human('Frodo');
+    sam = new Human('Sam');
     bot = new Bot(SimpleBotStrategy.findNext);
   });
 
@@ -26,48 +26,48 @@ describe('Game', () => {
     describe('when index is not specified', () => {
       it('sets user to player', () => {
         game.register(frodo);
-        expect(game.players[0].user).eq(frodo);
-        expect(game.players[1].user).is.undefined;
+        expect(game.players[0].profile).eq(frodo);
+        expect(game.players[1].profile).is.undefined;
       });
 
       it('returns registered player', () => {
         let res = game.register(frodo);
         expect(res).instanceOf(Player);
-        expect(res.user).eq(frodo);
+        expect(res.profile).eq(frodo);
       });
 
       it('sets user to first unregistered player', () => {
         game.register(frodo);
         game.register(sam);
-        expect(game.players[0].user).eq(frodo);
-        expect(game.players[1].user).eq(sam);
+        expect(game.players[0].profile).eq(frodo);
+        expect(game.players[1].profile).eq(sam);
       });
 
       it('does not reset registered players', () => {
         game.register(frodo);
         game.register(sam);
-        game.register(new User('Another'));
-        expect(game.players[0].user).eq(frodo);
-        expect(game.players[1].user).eq(sam);
+        game.register(new Human('Gandalf'));
+        expect(game.players[0].profile).eq(frodo);
+        expect(game.players[1].profile).eq(sam);
       });
     });
 
     describe('when index is specified', () => {
       it('sets @user to player at given index', () => {
         game.register(frodo, 1);
-        expect(game.players[1].user).eq(frodo);
+        expect(game.players[1].profile).eq(frodo);
       });
 
       it('returns registered player', () => {
         let res = game.register(frodo, 1);
         expect(res).instanceOf(Player);
-        expect(res.user).eq(frodo);
+        expect(res.profile).eq(frodo);
       });
 
       it('resets registered player', () => {
         game.register(frodo, 1);
         game.register(sam, 1);
-        expect(game.players[1].user).eq(sam);
+        expect(game.players[1].profile).eq(sam);
       });
     });
   });
@@ -119,6 +119,37 @@ describe('Game', () => {
     it('does not allow put value to busy cell', () => {
       game.put(1, 1, game.players[0]);
       expect(() => game.put(1, 1, game.players[1])).throws('Cell [1,1] is already busy');
+    });
+
+    describe('checks the win', () => {
+      beforeEach(() => {
+        game.values = [
+          [null, 'x', 'x'],
+          ['x', 'x', null],
+          [null, null, null],
+        ]
+      });
+
+      it('by row', () => {
+        game.put(0, 0, game.players[0]);
+        expect(game.winner).eq(game.players[0]);
+      });
+
+      it('by column', () => {
+        game.put(2, 1, game.players[0]);
+        expect(game.winner).eq(game.players[0]);
+      });
+
+      it('by diagonal 1', () => {
+        game.values[0][0] = 'x';
+        game.put(2, 2, game.players[0]);
+        expect(game.winner).eq(game.players[0]);
+      });
+
+      it('by diagonal 2', () => {
+        game.put(2, 0, game.players[0]);
+        expect(game.winner).eq(game.players[0]);
+      });
     });
 
     describe('when nobody wins', () => {
@@ -178,6 +209,32 @@ describe('Game', () => {
         game.put(2, 2, game.players[0]);
         expect(game.turns).eq(9);
         expect(game.isOver).eq(true);
+      });
+    });
+  });
+
+  describe('#json', () => {
+    it('returns json of the game', () => {
+      const json = game.json();
+      expect(json).eql({
+        values: game.values,
+        isOver: false,
+        winner: undefined
+      });
+    });
+
+    it('returns json of finished game', () => {
+      game.register(frodo);
+      game.register(bot);
+      game.winner = game.players[1];
+      const json = game.json();
+      expect(json).eql({
+        values: game.values,
+        isOver: true,
+        winner: {
+          id: game.players[1].id,
+          name: bot.name
+        }
       });
     });
   });
