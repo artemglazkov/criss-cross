@@ -1,7 +1,7 @@
 'use strict';
 
 const {expect} = require('chai');
-const {Human, Bot, Player, Game, SimpleBotStrategy} = require('../lib/domain');
+const {Human, Bot, Player, Game, BotStrategy} = require('../lib/domain');
 
 describe('Game', () => {
   let game;
@@ -11,7 +11,7 @@ describe('Game', () => {
     game = new Game();
     frodo = new Human('Frodo');
     sam = new Human('Sam');
-    bot = new Bot(SimpleBotStrategy.findNext);
+    bot = new Bot(BotStrategy.firstAvailable);
   });
 
   describe('#constructor', () => {
