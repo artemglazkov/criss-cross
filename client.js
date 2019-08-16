@@ -32,7 +32,7 @@ socket.on('status', (status) => {
   console.log(new ConsoleGameRenderer().render(status));
 });
 
-socket.on('statusError', (err) => {
+socket.on('putError', (err) => {
   console.error(err.message);
 });
 
