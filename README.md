@@ -1,8 +1,8 @@
 # Сriss Сross Game
 
-# How to play
+## How to play
 
-## Run server and clients
+### Run server and clients
 
 Start the game server:
 ```shell script
@@ -16,7 +16,7 @@ npm run client
 
 If you want ot play with each other start client twice in separate terminals. 
 
-## Start a new game
+### Start a new game
 
 To play with another player type:
 ```shell script
@@ -28,7 +28,7 @@ To play with a bot type:
 /start bot
 ```
 
-## Play the game
+### Play the game
 
 Play the Criss Cross game 3 x 3:
 ```text
